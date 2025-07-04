@@ -22,7 +22,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-4">
             <Logo />
           </div>
-          <CardTitle className="text-3xl font-headline">أهلاً بك في Tom Tom Kids</CardTitle>
+          <CardTitle className="text-3xl font-headline">أهلاً بك في Sugar Tamtom</CardTitle>
           <CardDescription>لوحة تحكم الإدارة</CardDescription>
         </CardHeader>
         <CardContent>

@@ -5,7 +5,7 @@ export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-2 font-headline">لوحة التحكم الرئيسية</h1>
-      <p className="text-muted-foreground mb-8">نظرة عامة على جميع أقسام Tom Tom Kids.</p>
+      <p className="text-muted-foreground mb-8">نظرة عامة على جميع أقسام Sugar Tamtom.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -51,7 +51,7 @@ export default function DashboardPage() {
       <div className="mt-8">
         <Card>
             <CardHeader>
-                <CardTitle>مرحباً بك في لوحة تحكم Tom Tom Kids</CardTitle>
+                <CardTitle>مرحباً بك في لوحة تحكم Sugar Tamtom</CardTitle>
                 <CardDescription>هذا هو مركزك لإدارة جميع جوانب علامتك التجارية. استخدم الشريط الجانبي للتنقل بين الأقسام المختلفة.</CardDescription>
             </CardHeader>
             <CardContent>

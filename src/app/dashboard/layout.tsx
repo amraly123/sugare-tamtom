@@ -45,7 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-3">
               <Logo />
               <div className="flex flex-col">
-                <h2 className="text-lg font-bold font-headline">Tom Tom Kids</h2>
+                <h2 className="text-lg font-bold font-headline">Sugar Tamtom</h2>
                 <p className="text-sm text-muted-foreground">لوحة التحكم</p>
               </div>
             </div>

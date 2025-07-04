@@ -18,7 +18,7 @@ const Logo = ({ className }: { className?: string }) => (
       textAnchor="middle"
       fontWeight="bold"
     >
-      TT
+      ST
     </text>
   </svg>
 );

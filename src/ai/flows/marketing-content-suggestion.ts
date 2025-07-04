@@ -19,10 +19,10 @@ const SuggestMarketingContentIdeasInputSchema = z.object({
     .describe('The current marketing trends in the kids clothing industry.'),
   brandGuidelines: z
     .string()
-    .describe('The brand guidelines for Tom Tom Kids.'),
+    .describe('The brand guidelines for Sugar Tamtom.'),
   pastSuccessfulCampaigns: z
     .string()
-    .describe('Details about past successful marketing campaigns for Tom Tom Kids.'),
+    .describe('Details about past successful marketing campaigns for Sugar Tamtom.'),
   targetAudience: z
     .string()
     .describe('The target audience for the marketing content.'),
