@@ -27,7 +27,7 @@ const SuggestOptimalPostingTimesOutputSchema = z.object({
   suggestedChannels: z
     .array(z.string())
     .describe('An array of suggested optimal channels for posting.'),
-  rationale: z.string().describe('The AI's rationale for the suggestions.'),
+  rationale: z.string().describe("The AI's rationale for the suggestions."),
 });
 export type SuggestOptimalPostingTimesOutput = z.infer<
   typeof SuggestOptimalPostingTimesOutputSchema
