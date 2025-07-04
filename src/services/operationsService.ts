@@ -1,28 +1,42 @@
-import { inventory, recentOrders, checklists, InventoryItem } from '@/data/operations';
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
+import type { InventoryItem, Order, Checklist } from '@/data/operations';
 
-// In a real app, this would fetch data from a database like Firestore.
-// We're using a delay to simulate a network request.
-
-const FAKE_DELAY = 700;
-
-export async function getInventory() {
-    await new Promise(resolve => setTimeout(resolve, FAKE_DELAY));
-    return inventory;
+export async function getInventory(): Promise<InventoryItem[]> {
+  const inventoryCollection = collection(db, 'inventory');
+  const snapshot = await getDocs(inventoryCollection);
+  if (snapshot.empty) {
+    console.warn("Firestore 'inventory' collection is empty. Please seed your database.");
+    return [];
+  }
+  // Assuming the document ID is the SKU
+  return snapshot.docs.map(doc => ({ ...doc.data(), sku: doc.id } as InventoryItem));
 }
 
-export async function getRecentOrders() {
-    await new Promise(resolve => setTimeout(resolve, FAKE_DELAY));
-    return recentOrders;
+export async function getRecentOrders(): Promise<Order[]> {
+  const ordersCollection = collection(db, 'orders');
+  const snapshot = await getDocs(ordersCollection);
+  if (snapshot.empty) {
+    console.warn("Firestore 'orders' collection is empty. Please seed your database.");
+    return [];
+  }
+  // Assuming the document ID is the order ID
+  return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Order));
 }
 
-export async function getChecklists() {
-    await new Promise(resolve => setTimeout(resolve, FAKE_DELAY));
-    return checklists;
+export async function getChecklists(): Promise<Checklist[]> {
+  const checklistsCollection = collection(db, 'checklists');
+  const snapshot = await getDocs(checklistsCollection);
+  if (snapshot.empty) {
+    console.warn("Firestore 'checklists' collection is empty. Please seed your database.");
+    return [];
+  }
+  // Assuming the document ID is the checklist ID
+  return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Checklist));
 }
 
 export async function getOperationsStats(inventoryData: InventoryItem[]) {
-    await new Promise(resolve => setTimeout(resolve, 0)); // No delay for calculation
-    
+    // This function remains unchanged as it operates on data passed to it.
     const totalStock = inventoryData.reduce((acc, item) => acc + item.stock, 0);
 
     const availableStock = inventoryData.filter(i => i.status === "متوفر").reduce((acc, item) => acc + item.stock, 0);
@@ -34,7 +48,6 @@ export async function getOperationsStats(inventoryData: InventoryItem[]) {
         { name: 'low', label: 'كمية قليلة', value: lowStock, fill: 'hsl(var(--accent))' },
         { name: 'out', label: 'نفذ المخزون', value: outOfStockCount, fill: 'hsl(var(--destructive))' },
     ].filter(d => d.value > 0);
-
 
     return {
         totalStock,
