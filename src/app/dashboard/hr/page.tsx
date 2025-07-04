@@ -4,16 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, User, Users, Calendar } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getEmployees, getHrStats } from "@/services/hrService";
 
-const employees = [
-  { id: 1, name: "نور الهدى", email: "nour@example.com", position: "مدير موارد بشرية", department: "الإدارة", status: "نشط" },
-  { id: 2, name: "أحمد المصري", email: "ahmad@example.com", position: "مسوق رقمي", department: "التسويق", status: "نشط" },
-  { id: 3, name: "سارة خليل", email: "sara@example.com", position: "محاسبة", department: "الحسابات", status: "في إجازة" },
-  { id: 4, name: "عمر الشامي", email: "omar@example.com", position: "مدير عمليات", department: "التشغيل", status: "نشط" },
-  { id: 5, name: "فاطمة الزهراء", email: "fatima@example.com", position: "مصممة أزياء", department: "التشغيل", status: "نشط" },
-];
+export default async function HRPage() {
+  const employees = await getEmployees();
+  const stats = await getHrStats();
 
-export default function HRPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
@@ -33,7 +29,7 @@ export default function HRPage() {
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">15</div>
+            <div className="text-3xl font-bold">{stats.totalEmployees}</div>
             <p className="text-xs text-muted-foreground">موظف نشط في الشركة</p>
           </CardContent>
         </Card>
@@ -43,7 +39,7 @@ export default function HRPage() {
             <User className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">+2</div>
+            <div className="text-3xl font-bold">+{stats.newThisMonth}</div>
              <p className="text-xs text-muted-foreground">انضموا حديثًا</p>
           </CardContent>
         </Card>
@@ -53,7 +49,7 @@ export default function HRPage() {
             <Calendar className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">95%</div>
+            <div className="text-3xl font-bold">{stats.attendance}%</div>
             <p className="text-xs text-muted-foreground">معدل الحضور للجميع</p>
           </CardContent>
         </Card>

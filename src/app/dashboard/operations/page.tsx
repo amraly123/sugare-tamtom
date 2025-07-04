@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -7,81 +8,64 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
-import { PlusCircle, Package, Gauge, Clock, ClipboardList, CheckSquare } from "lucide-react";
+import { PlusCircle, Package, Gauge, Clock, ClipboardList, CheckSquare, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { getInventory, getRecentOrders, getChecklists, getOperationsStats } from "@/services/operationsService";
+import type { InventoryItem, Order, Checklist } from "@/data/operations";
 
-const inventory = [
-  { sku: "DRS-SMR-PNK-S", name: "فستان صيفي بناتي", stock: 120, category: "فساتين", status: "متوفر", imageHint: "kids dress" },
-  { sku: "SET-JNS-BLU-M", name: "طقم ولادي جينز", stock: 80, category: "أطقم", status: "متوفر", imageHint: "boys outfit" },
-  { sku: "PJM-CTN-WHT-L", name: "بيجامة أطفال قطن", stock: 5, category: "ملابس نوم", status: "كمية قليلة", imageHint: "kids pajamas" },
-  { sku: "JKT-WNT-BLK-M", name: "جاكيت شتوي", stock: 0, category: "ملابس خارجية", status: "نفذ المخزون", imageHint: "kids jacket" },
-  { sku: "SWM-SHT-GRN-S", name: "شورت سباحة", stock: 200, category: "ملابس سباحة", status: "متوفر", imageHint: "swim shorts" },
-];
-
-const availableStock = inventory.filter(i => i.status === "متوفر").reduce((acc, item) => acc + item.stock, 0);
-const lowStock = inventory.filter(i => i.status === "كمية قليلة").reduce((acc, item) => acc + item.stock, 0);
-const outOfStockCount = inventory.filter(i => i.status === "نفذ المخزون").length;
-
-const inventoryStatusData = [
-    { name: 'available', label: 'متوفر', value: availableStock, fill: 'hsl(var(--primary))' },
-    { name: 'low', label: 'كمية قليلة', value: lowStock, fill: 'hsl(var(--accent))' },
-    { name: 'out', label: 'نفذ المخزون', value: outOfStockCount, fill: 'hsl(var(--destructive))' },
-].filter(d => d.value > 0);
-
-const chartConfig = {
-    value: {
-      label: "قطع",
-    },
-    available: {
-        label: "متوفر",
-        color: "hsl(var(--primary))",
-    },
-    low: {
-        label: "كمية قليلة",
-        color: "hsl(var(--accent))",
-    },
-    out: {
-        label: `نفذ المخزون (${outOfStockCount} صنف)`,
-        color: "hsl(var(--destructive))",
-    }
+const chartConfigBase = {
+    value: { label: "قطع" },
+    available: { label: "متوفر", color: "hsl(var(--primary))" },
+    low: { label: "كمية قليلة", color: "hsl(var(--accent))" },
 };
 
-const recentOrders = [
-  { id: "ORD-1024", customer: "علياء محمد", status: "تم التسليم", progress: 100 },
-  { id: "ORD-1023", customer: "خالد يوسف", status: "في الشحن", progress: 75 },
-  { id: "ORD-1022", customer: "فاطمة أحمد", status: "تحت التجهيز", progress: 45 },
-  { id: "ORD-1021", customer: "حسن إبراهيم", status: "طلب جديد", progress: 10 },
-];
-
-const checklists = [
-    { 
-        id: "fulfillment",
-        title: "قائمة التحقق الرقمية لتجهيز الطلبات",
-        steps: [
-            "استلام وتأكيد الطلب",
-            "اختيار المنتجات الصحيحة من المخزون",
-            "فحص الجودة المبدئي للمنتجات",
-            "تغليف المنتجات بشكل آمن",
-            "طباعة بوليصة الشحن",
-            "تسليم الشحنة لمندوب شركة الشحن"
-        ]
-    },
-    { 
-        id: "quality",
-        title: "قائمة التحقق الرقمية لفحص الجودة",
-        steps: [
-            "فحص الأقمشة (خلوها من العيوب)",
-            "فحص الخياطة والتطريز",
-            "التأكد من المقاسات والأبعاد",
-            "فحص الأزرار والسحابات",
-            "التحقق من تطابق اللون",
-            "الكي والتغليف النهائي"
-        ]
-    },
-];
-
 export default function OperationsPage() {
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [checklists, setChecklists] = useState<Checklist[]>([]);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const invData = await getInventory();
+        const ordData = await getRecentOrders();
+        const chkData = await getChecklists();
+        const statData = await getOperationsStats(invData);
+        
+        setInventory(invData);
+        setRecentOrders(ordData);
+        setChecklists(chkData);
+        setStats(statData);
+
+      } catch (error) {
+        console.error("Failed to fetch operations data", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading || !stats) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  const chartConfig = {
+      ...chartConfigBase,
+      out: {
+        label: `نفذ المخزون (${stats.outOfStockCount} صنف)`,
+        color: "hsl(var(--destructive))",
+    }
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center flex-wrap gap-4">
@@ -102,7 +86,7 @@ export default function OperationsPage() {
                 <Package className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-                <div className="text-3xl font-bold">{inventory.reduce((acc, item) => acc + item.stock, 0)}</div>
+                <div className="text-3xl font-bold">{stats.totalStock}</div>
                 <p className="text-xs text-muted-foreground">إجمالي عدد القطع المتاحة</p>
             </CardContent>
         </Card>
@@ -112,7 +96,7 @@ export default function OperationsPage() {
                 <Gauge className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-                <div className="text-3xl font-bold">98.5%</div>
+                <div className="text-3xl font-bold">{stats.inventoryAccuracy}%</div>
                 <p className="text-xs text-muted-foreground">مقارنة بالجرد الفعلي</p>
             </CardContent>
         </Card>
@@ -122,7 +106,7 @@ export default function OperationsPage() {
                 <Clock className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-                <div className="text-3xl font-bold">3.5 ساعات</div>
+                <div className="text-3xl font-bold">{stats.avgFulfillmentTime}</div>
                 <p className="text-xs text-muted-foreground">من الطلب إلى الشحن</p>
             </CardContent>
         </Card>
@@ -181,8 +165,8 @@ export default function OperationsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" hideLabel />} />
-                            <Pie data={inventoryStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={50} labelLine={false} label={({ percent }) => `${(percent * 100).toFixed(0)}%`}>
-                                {inventoryStatusData.map((entry) => (
+                            <Pie data={stats.inventoryStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} innerRadius={50} labelLine={false} label={({ percent }) => `${(percent * 100).toFixed(0)}%`}>
+                                {stats.inventoryStatusData.map((entry: any) => (
                                     <Cell key={`cell-${entry.name}`} fill={entry.fill} />
                                 ))}
                             </Pie>
