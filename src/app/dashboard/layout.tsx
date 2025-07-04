@@ -1,8 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   SidebarProvider,
   Sidebar,
@@ -24,6 +27,7 @@ import {
   Truck,
   LayoutDashboard,
   LogOut,
+  Loader2,
 } from 'lucide-react';
 
 const navItems = [
@@ -36,6 +40,31 @@ const navItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-muted/50">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -68,12 +97,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
-            <Link href="/" passHref>
-               <SidebarMenuButton>
-                <LogOut />
-                <span>تسجيل الخروج</span>
-               </SidebarMenuButton>
-            </Link>
+            <SidebarMenuButton onClick={handleSignOut}>
+              <LogOut />
+              <span>تسجيل الخروج</span>
+            </SidebarMenuButton>
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
