@@ -77,7 +77,7 @@ export default function ReadyPrompts() {
   };
 
   return (
-    <Card className="shadow-lg mt-8">
+    <Card className="shadow-lg">
       <CardHeader>
         <div className="flex items-center gap-3">
           <Wand className="h-8 w-8 text-primary" />
