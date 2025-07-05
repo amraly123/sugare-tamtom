@@ -34,5 +34,9 @@
     "frameworksBackend": {
       "region": "europe-west4"
     }
+  },
+  "functions": {
+    "source": ".",
+    "runtime": "nodejs20"
   }
 }
