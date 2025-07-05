@@ -1,4 +1,5 @@
 import AiAssistant from './components/ai-assistant';
+import ReadyPrompts from './components/ready-prompts';
 
 export default function MarketingPage() {
   return (
@@ -9,6 +10,7 @@ export default function MarketingPage() {
       </div>
       
       <AiAssistant />
+      <ReadyPrompts />
     </div>
   );
 }
